@@ -9,11 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	
+
 	"golang.org/x/net/html/charset"
 	"crypto/tls"
-
-
 )
 
 // HeaderParams holds params specific to the header
@@ -34,10 +32,15 @@ func SoapClient(wsdl string) (*Client, error) {
 		return nil, err
 	}
 
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	}
+
 	c := &Client{
 		WSDL:        wsdl,
 		URL:         strings.TrimSuffix(d.TargetNamespace, "/"),
 		Definitions: d,
+		HttpClient:  &http.Client{Transport: transCfg},
 	}
 
 	return c, nil
@@ -101,9 +104,9 @@ func (c *Client) Call(m string, p Params) (err error) {
 	// https://stackoverflow.com/questions/6002619/unmarshal-an-iso-8859-1-xml-input-in-go
 	// https://github.com/golang/go/issues/8937
 
-        decoder := xml.NewDecoder( bytes.NewReader(b) )
-        decoder.CharsetReader = charset.NewReaderLabel
-        err = decoder.Decode(&soap)
+	decoder := xml.NewDecoder( bytes.NewReader(b) )
+	decoder.CharsetReader = charset.NewReaderLabel
+	err = decoder.Decode(&soap)
 
 	c.Body = soap.Body.Contents
 	c.Header = soap.Header.Contents
@@ -129,15 +132,6 @@ func (c *Client) Unmarshal(v interface{}) error {
 // doRequest makes new request to the server using the c.Method, c.URL and the body.
 // body is enveloped in Call method
 func (c *Client) doRequest(url string) ([]byte, error) {
-
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
-	}
-	//c.HttpClient=&http.Client{Transport: transCfg}
-	//client := &http.Client{Transport: transCfg}
-	//http.Client.Transport=transCfg
-	//req, err := client.NewRequest("POST", url, bytes.NewBuffer(c.payload))
-	//client.Post(url,"",bytes.NewBuffer(c.payload))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(c.payload))
 	if err != nil {
 		return nil, err
@@ -148,7 +142,7 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	}
 
 	if c.HttpClient == nil {
-		c.HttpClient =&http.Client{Transport: transCfg}// &http.Client{}
+		c.HttpClient = &http.Client{}
 	}
 
 	req.ContentLength = int64(len(c.payload))
@@ -156,12 +150,6 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	req.Header.Add("Content-Type", "text/xml;charset=UTF-8")
 	req.Header.Add("Accept", "text/xml")
 	req.Header.Add("SOAPAction", c.SoapAction)
-
-	//resp, err :=client.Do(req)
-
-	//if err!=nil{
-	//	fmt.Println("*0*0*0* :  "+err.Error())
-	//}
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
