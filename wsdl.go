@@ -6,8 +6,7 @@ import (
 	"golang.org/x/net/html/charset"
 	"crypto/tls"
 
-
-
+	"github.com/pkg/errors"
 )
 
 type wsdlDefinitions struct {
@@ -167,7 +166,7 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
     //http.Client.Transport=transCfg
 	//r, err := http.Get(u)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("burasi*** "+err.Error())
 	}
 	defer r.Body.Close()
 
