@@ -11,6 +11,8 @@ import (
 	"strings"
 	
 	"golang.org/x/net/html/charset"
+	"crypto/tls"
+
 )
 
 // HeaderParams holds params specific to the header
@@ -126,6 +128,13 @@ func (c *Client) Unmarshal(v interface{}) error {
 // doRequest makes new request to the server using the c.Method, c.URL and the body.
 // body is enveloped in Call method
 func (c *Client) doRequest(url string) ([]byte, error) {
+
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	}
+	//client := &http.Client{Transport: transCfg}
+	http.Client.Transport=transCfg
+	//req, err := client.NewRequest("POST", url, bytes.NewBuffer(c.payload))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(c.payload))
 	if err != nil {
 		return nil, err
