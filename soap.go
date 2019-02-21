@@ -132,9 +132,11 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
 	}
+	c.HttpClient=&http.Client{Transport: transCfg}
 	//client := &http.Client{Transport: transCfg}
-	http.Client.Transport=transCfg
+	//http.Client.Transport=transCfg
 	//req, err := client.NewRequest("POST", url, bytes.NewBuffer(c.payload))
+	//client.Post(url,"",bytes.NewBuffer(c.payload))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(c.payload))
 	if err != nil {
 		return nil, err

@@ -6,7 +6,8 @@ import (
 	"golang.org/x/net/html/charset"
 	"crypto/tls"
 
-	"github.com/aws/aws-sdk-go/aws/client"
+
+
 )
 
 type wsdlDefinitions struct {
@@ -161,10 +162,10 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
 	}
-	//client := &http.Client{Transport: transCfg}
-	//r, err := client.Get(u)
-    http.Client.Transport=transCfg
-	r, err := http.Get(u)
+	client := &http.Client{Transport: transCfg}
+	r, err := client.Get(u)
+    //http.Client.Transport=transCfg
+	//r, err := http.Get(u)
 	if err != nil {
 		return nil, err
 	}
