@@ -134,7 +134,7 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
 	}
 	//c.HttpClient=&http.Client{Transport: transCfg}
-	client := &http.Client{Transport: transCfg}
+	//client := &http.Client{Transport: transCfg}
 	//http.Client.Transport=transCfg
 	//req, err := client.NewRequest("POST", url, bytes.NewBuffer(c.payload))
 	//client.Post(url,"",bytes.NewBuffer(c.payload))
@@ -148,7 +148,7 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	}
 
 	if c.HttpClient == nil {
-		c.HttpClient = &http.Client{}
+		c.HttpClient =&http.Client{Transport: transCfg}// &http.Client{}
 	}
 
 	req.ContentLength = int64(len(c.payload))
@@ -157,9 +157,13 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	req.Header.Add("Accept", "text/xml")
 	req.Header.Add("SOAPAction", c.SoapAction)
 
-	resp, err :=client.Do(req)
+	//resp, err :=client.Do(req)
 
-	//resp, err := c.HttpClient.Do(req)
+	//if err!=nil{
+	//	fmt.Println("*0*0*0* :  "+err.Error())
+	//}
+
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
