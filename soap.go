@@ -33,7 +33,7 @@ func SoapClient(wsdl string) (*Client, error) {
 	}
 
 	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true , MaxIdleConnsPerHost: 10000}, // ignore expired SSL certificates
 	}
 
 	c := &Client{
