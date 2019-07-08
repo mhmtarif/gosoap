@@ -158,9 +158,16 @@ type xsdMaxInclusive struct {
 // getWsdlDefinitions sent request to the wsdl url and set definitions on struct
 func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 
+	//transCfg := &http.Transport{
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	//}
+
 	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
+		MaxIdleConnsPerHost: 10000 , // ignore expired SSL certificates
 	}
+
+
 	client := &http.Client{Transport: transCfg}
 	r, err := client.Get(u)
     //http.Client.Transport=transCfg
