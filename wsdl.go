@@ -164,7 +164,8 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
-		MaxIdleConnsPerHost: 1000 , // ignore expired SSL certificates
+		MaxIdleConnsPerHost: 500 , // ignore expired SSL certificates
+		MaxIdleConns: 500 ,
 	}
 
 
