@@ -2,6 +2,8 @@ package gosoap
 
 import (
 	"encoding/xml"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"golang.org/x/net/html/charset"
 	"crypto/tls"
@@ -164,8 +166,8 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
-		MaxIdleConnsPerHost: 500 , // ignore expired SSL certificates
-		MaxIdleConns: 500 ,
+		MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
+		MaxIdleConns: 300 ,
 	}
 
 
@@ -173,10 +175,19 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 	r, err := client.Get(u)
     //http.Client.Transport=transCfg
 	//r, err := http.Get(u)
+
+	defer func() {
+		if r != nil {
+			_, err = io.Copy(ioutil.Discard, r.Body)
+			r.Body.Close()
+		}
+	}()
+
+
 	if err != nil {
 		return nil, errors.New("burasi*** "+err.Error())
 	}
-	defer r.Body.Close()
+	//defer r.Body.Close()
 
 	decoder := xml.NewDecoder(r.Body)
 	decoder.CharsetReader = charset.NewReaderLabel

@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -34,8 +35,8 @@ func SoapClient(wsdl string) (*Client, error) {
 
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
-		MaxIdleConnsPerHost: 500 , // ignore expired SSL certificates
-		MaxIdleConns: 500 ,
+		MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
+		MaxIdleConns: 300 ,
 	}
 
 	c := &Client{
@@ -154,10 +155,18 @@ func (c *Client) doRequest(url string) ([]byte, error) {
 	req.Header.Add("SOAPAction", c.SoapAction)
 
 	resp, err := c.HttpClient.Do(req)
+
+	defer func() {
+		if resp != nil {
+			_, err = io.Copy(ioutil.Discard, resp.Body)
+			resp.Body.Close()
+		}
+	}()
+
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	//defer resp.Body.Close()
 
 	return ioutil.ReadAll(resp.Body)
 }
