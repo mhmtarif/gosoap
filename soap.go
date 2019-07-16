@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/html/charset"
-	"crypto/tls"
 )
 
 // HeaderParams holds params specific to the header
@@ -33,17 +32,27 @@ func SoapClient(wsdl string) (*Client, error) {
 		return nil, err
 	}
 
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
-		MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
-		MaxIdleConns: 300 ,
-	}
+	//--------
+	//transCfg := &http.Transport{
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
+	//	MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
+	//	MaxIdleConns: 300 ,
+	//}
+	//
+	//c := &Client{
+	//	WSDL:        wsdl,
+	//	URL:         strings.TrimSuffix(d.TargetNamespace, "/"),
+	//	Definitions: d,
+	//	HttpClient:  &http.Client{Transport: transCfg},
+	//}
+	//--------
+
 
 	c := &Client{
 		WSDL:        wsdl,
 		URL:         strings.TrimSuffix(d.TargetNamespace, "/"),
 		Definitions: d,
-		HttpClient:  &http.Client{Transport: transCfg},
+		HttpClient:  myclient,
 	}
 
 	return c, nil

@@ -2,13 +2,10 @@ package gosoap
 
 import (
 	"encoding/xml"
+	"github.com/pkg/errors"
+	"golang.org/x/net/html/charset"
 	"io"
 	"io/ioutil"
-	"net/http"
-	"golang.org/x/net/html/charset"
-	"crypto/tls"
-
-	"github.com/pkg/errors"
 )
 
 type wsdlDefinitions struct {
@@ -164,15 +161,21 @@ func getWsdlDefinitions(u string) (wsdl *wsdlDefinitions, err error) {
 	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
 	//}
 
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
-		MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
-		MaxIdleConns: 300 ,
-	}
+	//----
+	//transCfg := &http.Transport{
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
+	//	MaxIdleConnsPerHost: 300 , // ignore expired SSL certificates
+	//	MaxIdleConns: 300 ,
+	//}
+	//
+	//
+	//client := &http.Client{Transport: transCfg}
+	//r, err := client.Get(u)
+	//----
+	r, err := myclient.Get(u)
 
 
-	client := &http.Client{Transport: transCfg}
-	r, err := client.Get(u)
+
     //http.Client.Transport=transCfg
 	//r, err := http.Get(u)
 
